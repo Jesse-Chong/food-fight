@@ -6,8 +6,6 @@ export default class GameScene extends Phaser.Scene {
     }
   
     create() {
-        // x axis, y axis, use unique key from preload
-      this.add.sprite(200, 300, 'applePie');
         // add static background image 
         const bg = this.add.image(0, 0, 'bg');
         bg.setOrigin(0, 0);
@@ -15,6 +13,8 @@ export default class GameScene extends Phaser.Scene {
         bg.displayWidth = this.scale.width;
         // scale height
         bg.displayHeight = this.scale.height;
+        // x axis, y axis, use unique key from preload
+        this.add.sprite(200, 300, 'applePie');
     }
   
   }
