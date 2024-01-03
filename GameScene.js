@@ -3,9 +3,9 @@
 // For example, to simulate the effects of gravity on a sprite, it's as simple as writing:
 // player.body.setGravityY(300)
 // This is an arbitrary value, but logically, the higher the value, the heavier your object feels and the quicker it falls.
-
+let cursors;
+let player;
 class GameScene extends Phaser.Scene {
-
     preload() {
       this.load.image('applePie', '05_apple_pie.png');
       this.load.image('bg', 'game_background_1.png');
@@ -17,7 +17,7 @@ class GameScene extends Phaser.Scene {
   );
     }
   
-    //0x0 to 800x600 max position or else objects will be obb screen 
+    // 0x0 to 800x600 max position or else objects will be obb screen 
     // phaser 3 game objects are positioned based on their center
     // there are two types of  physics bodies: dynamic and static
     // they static cannot move and isnt affected by other objects colliding
@@ -42,7 +42,6 @@ class GameScene extends Phaser.Scene {
         platforms.create(600, 400, 'ground');
 
         // dynamic physics is automatic
-        let player;
         player = this.physics.add.sprite(100, 450, 'dude');
         // after landing bounce a little
         player.setBounce(0.2);
@@ -50,6 +49,11 @@ class GameScene extends Phaser.Scene {
         player.body.setGravityY(300)
         // stop player from going out of bounds
         player.setCollideWorldBounds(true);
+        // prevents player from going through platform
+        // this object monitors two physics objects (which can include Groups) 
+        // and checks for collisions or overlap between them. If that occurs it can 
+        // then optionally invoke your own callback, but for the sake of just colliding with platforms we don't require that
+        this.physics.add.collider(player, platforms);
 
         // a sprite sheet has animation frames
         this.anims.create({
@@ -74,8 +78,38 @@ class GameScene extends Phaser.Scene {
         frameRate: 10,
         repeat: -1
 });
+cursors = this.input.keyboard.createCursorKeys();
+
+// this lets player move and jump
+// this populates the cursors object with four properties: up, down, left, right, that are all instances of Key objects. 
+// then all we need to do is poll these in our update loop
+
     }
-    
+    update() {
+        if (cursors.left.isDown)
+{
+    player.setVelocityX(-160);
+
+    player.anims.play('left', true);
+}
+else if (cursors.right.isDown)
+{
+    player.setVelocityX(160);
+
+    player.anims.play('right', true);
+}
+else
+{
+    player.setVelocityX(0);
+
+    player.anims.play('turn');
+}
+
+if (cursors.up.isDown && player.body.touching.down)
+{
+    player.setVelocityY(-600);
+}
+    }
   
   }
 
