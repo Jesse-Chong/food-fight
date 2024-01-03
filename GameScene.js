@@ -7,6 +7,8 @@ let cursors;
 let player;
 let stars;
 let platforms;
+let score = 0;
+let scoreText;
 
 class GameScene extends Phaser.Scene {
   preload() {
@@ -15,6 +17,7 @@ class GameScene extends Phaser.Scene {
     this.load.image("bread", "07_bread.png");
     this.load.image("ground", "platform.png");
     this.load.image("star", "star.png");
+    this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet("dude", "dude.png", {
       frameWidth: 32,
       frameHeight: 48,
@@ -96,6 +99,8 @@ class GameScene extends Phaser.Scene {
     stars.children.iterate(function (child) {
       child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     });
+    // (coordinate, coordinate, display score, {size of font, fill with black})
+    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
     this.physics.add.collider(stars, platforms);
     // check if player overlaps with star and the callback function makes star disappear
     // null is in place of an extra Callback, this is the context for the callback
@@ -129,6 +134,8 @@ class GameScene extends Phaser.Scene {
 function collectStar (player, star)
 {
     star.disableBody(true, true);
+    score += 10;
+    scoreText.setText('Score: ' + score);
 }
 
 export default GameScene;
