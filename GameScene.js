@@ -1,9 +1,20 @@
+// When a Physics Sprite is created it is given a body property, which is a reference to its Arcade Physics Body. This represents the sprite as a physical body in Phasers Arcade Physics engine. 
+// The body object has a lot of properties and methods that we can play with.
+// For example, to simulate the effects of gravity on a sprite, it's as simple as writing:
+// player.body.setGravityY(300)
+// This is an arbitrary value, but logically, the higher the value, the heavier your object feels and the quicker it falls.
+
 class GameScene extends Phaser.Scene {
 
     preload() {
       this.load.image('applePie', '05_apple_pie.png');
       this.load.image('bg', 'game_background_1.png');
       this.load.image('bread', '07_bread.png');
+      this.load.image('ground', 'platform.png');
+      this.load.spritesheet('dude', 
+      'dude.png',
+      { frameWidth: 32, frameHeight: 48 }
+  );
     }
   
     //0x0 to 800x600 max position or else objects will be obb screen 
@@ -12,6 +23,11 @@ class GameScene extends Phaser.Scene {
     // they static cannot move and isnt affected by other objects colliding
     // staticGroup lets you create children that are all static and place
     // it anywhere on the screen and also set a size
+    // refreshbody tells physics the changes we made, which is setScale(2) 
+    // to make the platform go across the whole screen
+    // In Phaser 3 the Animation Manager is a global system.
+    // Animations created within it are globally available to all Game Objects. 
+    // They share the base animation data while managing their own timelines.
     create() {
         // add static background image 
         const bg = this.add.image(0, 0, 'bg');
@@ -22,12 +38,42 @@ class GameScene extends Phaser.Scene {
         bg.displayHeight = this.scale.height;
         let platforms;
         platforms = this.physics.add.staticGroup();
-        platforms.create(400, 568, 'bread').setScale(2).refreshBody();
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        platforms.create(600, 400, 'ground');
 
-platforms.create(600, 400, 'bread');
-platforms.create(50, 250, 'bread');
-platforms.create(750, 220, 'bread');
+        // dynamic physics is automatic
+        let player;
+        player = this.physics.add.sprite(100, 450, 'dude');
+        // after landing bounce a little
+        player.setBounce(0.2);
+        // make player fall faster
+        player.body.setGravityY(300)
+        // stop player from going out of bounds
+        player.setCollideWorldBounds(true);
 
+        // a sprite sheet has animation frames
+        this.anims.create({
+        key: 'left',
+        // use frames 0-3
+        frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+        // run at 10 frames per second
+        frameRate: 10,
+        // loop this animation
+        repeat: -1
+});
+
+        this.anims.create({
+        key: 'turn',
+        frames: [ { key: 'dude', frame: 4 } ],
+        frameRate: 20
+});
+
+        this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+});
     }
     
   
